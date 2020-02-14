@@ -46,8 +46,8 @@ resource "aws_instance" "albuquerque-debian-nginx-1" {
   key_name                    = "dckeypair"
   subnet_id                   = aws_subnet.dc_tmp_subnet.id
   vpc_security_group_ids      = aws_security_group.dc_tmp-allow_tls_http_and_ssh.id
-  associate_public_ip_address = 1
-  tags {
+  associate_public_ip_address = true
+  tags = {
     Name = "Server1"
   }
 }
