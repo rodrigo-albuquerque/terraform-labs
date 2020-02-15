@@ -9,7 +9,7 @@ resource "aws_vpc" "dc_tmp_vpc" {
 resource "aws_subnet" "dc_tmp_subnet" {
   vpc_id = aws_vpc.dc_tmp_vpc.id
   cidr_block = "172.16.199.0/25"
-  availability_zone = "us-east-1"
+  availability_zone = "us-east-1a"
 
   tags = {
     Name = "albuquerque-dc_tmp_subnet"
@@ -22,9 +22,25 @@ resource "aws_security_group" "dc_tmp-allow_tls_http_and_ssh" {
   vpc_id      = aws_vpc.dc_tmp_vpc.id
 
   ingress {
-    # SSH, HTTP and TLS
-    from_port   = 0
-    to_port     = 0
+    # SSH,
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]# add your IP address here
+  }
+
+  ingress {
+    # HTTP
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    # HTTPS
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]# add your IP address here
   }
@@ -33,6 +49,7 @@ resource "aws_security_group" "dc_tmp-allow_tls_http_and_ssh" {
     from_port          = 0
     to_port            = 0
     protocol           = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
