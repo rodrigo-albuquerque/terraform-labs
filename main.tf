@@ -16,6 +16,11 @@ resource "aws_subnet" "albuquerque_subnet" {
   }
 }
 
+resource "aws_route_table_association" "albuquerque_subnet_association" {
+  subnet_id = aws_subnet.albuquerque_subnet.id
+  route_table_id = aws_route_table.albuquerque_rt.id
+}
+
 resource "aws_security_group" "albuquerque_sg" {
   name        = "allow_tls"
   description = "Allow TLS inbound traffic"
@@ -57,6 +62,26 @@ resource "aws_security_group" "albuquerque_sg" {
   }
 }
 
+resource "aws_internet_gateway" "albuquerque_igw" {
+  vpc_id = aws_vpc.albuquerque_vpc.id
+
+  tags = {
+    Name = "albuquerque_igw"
+  }
+}
+
+resource "aws_route_table" "albuquerque_rt" {
+  vpc_id = aws_vpc.albuquerque_vpc.id
+  route {
+    cidr_block="0.0.0.0/0"
+    gateway_id = aws_internet_gateway.albuquerque_igw.id
+  }
+
+  tags = {
+    Name = "albuquerque_rt"
+  }
+}
+
 resource "aws_instance" "albuquerque-debian-nginx-1" {
   ami                         = data.aws_ami.debian.id
   instance_type               = "t2.micro"
@@ -64,6 +89,7 @@ resource "aws_instance" "albuquerque-debian-nginx-1" {
   subnet_id                   = aws_subnet.albuquerque_subnet.id
   vpc_security_group_ids      = [aws_security_group.albuquerque_sg.id]
   associate_public_ip_address = true
+  depends_on = [aws_internet_gateway.albuquerque_igw]
   tags = {
     Name = "albuquerque-nginx1"
   }
