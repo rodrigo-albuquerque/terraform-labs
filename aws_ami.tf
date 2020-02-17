@@ -1,4 +1,4 @@
-# This file finds the right Ubuntu AMI to install ou our servers.
+# This file finds the right Debian AMI to install on our servers.
 data "aws_ami" debian {
   most_recent = true
 
