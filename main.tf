@@ -52,9 +52,9 @@ resource "aws_security_group" "albuquerque_sg" {
 
   ingress {
     # ICMPv4
-    from_port   = 0
-    to_port     = 0
-    protocol    = "ICMPv4"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"] # add your IP address here
   }
 
@@ -97,36 +97,105 @@ resource "aws_instance" "albuquerque-debian-nginx-lb" {
   subnet_id                   = aws_subnet.albuquerque_subnet.id
   vpc_security_group_ids      = [aws_security_group.albuquerque_sg.id]
   associate_public_ip_address = true
-  private_ip                  = "172.16.199.120"
+  private_ip                  = "172.16.199.30"
   depends_on                  = [aws_internet_gateway.albuquerque_igw]
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "admin"
+      private_key = file("~/Downloads/dckeypair.pem")
+      host        = aws_instance.albuquerque-debian-nginx-lb.public_ip
+    }
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get upgrade -y",
+      "sudo apt-get install nginx -y"
+    ]
+  }
   tags = {
     Name = "albuquerque-debian-nginx-lb"
   }
 }
 
 resource "aws_instance" "albuquerque-debian-nginx-srv1" {
-  ami                    = data.aws_ami.debian.id
-  instance_type          = "t2.micro"
-  key_name               = "dckeypair"
-  subnet_id              = aws_subnet.albuquerque_subnet.id
-  vpc_security_group_ids = [aws_security_group.albuquerque_sg.id]
-  private_ip             = "172.16.199.31"
-  depends_on             = [aws_instance.albuquerque-debian-nginx-lb]
+  ami                         = data.aws_ami.debian.id
+  instance_type               = "t2.micro"
+  key_name                    = "dckeypair"
+  subnet_id                   = aws_subnet.albuquerque_subnet.id
+  vpc_security_group_ids      = [aws_security_group.albuquerque_sg.id]
+  associate_public_ip_address = true
+  private_ip                  = "172.16.199.31"
+  depends_on                  = [aws_instance.albuquerque-debian-nginx-lb]
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "admin"
+      private_key = file("~/Downloads/dckeypair.pem")
+      host        = aws_instance.albuquerque-debian-nginx-srv1.public_ip
+    }
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get upgrade -y",
+      "sudo apt-get install nginx -y"
+    ]
+  }
   tags = {
     Name = "albuquerque-debian-nginx-srv1"
   }
 }
 
 resource "aws_instance" "albuquerque-debian-nginx-srv2" {
-  ami                    = data.aws_ami.debian.id
-  instance_type          = "t2.micro"
-  key_name               = "dckeypair"
-  subnet_id              = aws_subnet.albuquerque_subnet.id
-  vpc_security_group_ids = [aws_security_group.albuquerque_sg.id]
-  private_ip             = "172.16.199.32"
-  depends_on             = [aws_instance.albuquerque-debian-nginx-lb]
+  ami                         = data.aws_ami.debian.id
+  instance_type               = "t2.micro"
+  key_name                    = "dckeypair"
+  subnet_id                   = aws_subnet.albuquerque_subnet.id
+  vpc_security_group_ids      = [aws_security_group.albuquerque_sg.id]
+  associate_public_ip_address = true
+  private_ip                  = "172.16.199.32"
+  depends_on                  = [aws_instance.albuquerque-debian-nginx-lb]
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "admin"
+      private_key = file("~/Downloads/dckeypair.pem")
+      host        = aws_instance.albuquerque-debian-nginx-srv2.public_ip
+    }
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get upgrade -y",
+      "sudo apt-get install nginx -y"
+    ]
+  }
   tags = {
     Name = "albuquerque-debian-nginx-srv2"
+  }
+
+}
+
+resource "aws_instance" "albuquerque-debian-nginx-srv3" {
+  ami                         = data.aws_ami.debian.id
+  instance_type               = "t2.micro"
+  key_name                    = "dckeypair"
+  subnet_id                   = aws_subnet.albuquerque_subnet.id
+  vpc_security_group_ids      = [aws_security_group.albuquerque_sg.id]
+  associate_public_ip_address = true
+  private_ip                  = "172.16.199.33"
+  depends_on                  = [aws_instance.albuquerque-debian-nginx-lb]
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "admin"
+      private_key = file("~/Downloads/dckeypair.pem")
+      host        = aws_instance.albuquerque-debian-nginx-srv3.public_ip
+    }
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get upgrade -y",
+      "sudo apt-get install nginx -y"
+    ]
+  }
+  tags = {
+    Name = "albuquerque-debian-nginx-srv3"
   }
 
 }
